@@ -1,6 +1,15 @@
-# DEV deps
-pydantic<3
-# typing-extensions==4.12.2
+# core
+pydantic==2.11.3
+
+# CLI
+tqdm==4.67.1
+click==8.1.8
+
+# Index / ES
+
+
+# dev
+typing-extensions==4.12.2
 ruff
 pur
 pytest
