@@ -1,5 +1,5 @@
 # DEV deps
-streamlit==1.44.1
+pydantic<3
 # typing-extensions==4.12.2
 ruff
 pur
