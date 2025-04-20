@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 import logging
 from contextlib import contextmanager
@@ -53,9 +54,7 @@ class WikiArchiveLoader:
         "person-characters.jsonlines": PersonCharacter,
     }
 
-    def __init__(
-        self, archive_path: str, silent_validation_error=False, stop_on_error=True
-    ):
+    def __init__(self, archive_path: str, stop_on_error=True):
         """
         Initialize the loader with the path to the zip archive.
 
@@ -63,8 +62,8 @@ class WikiArchiveLoader:
             archive_path: Path to the zip archive containing JSONL files
         """
         self.__archive_path = archive_path
-        self.__silent_validation_error = silent_validation_error
         self.__stop_on_error = stop_on_error
+        self.__validation_errors: dict[type, list[ValidationError]] = defaultdict(list)
 
     @contextmanager
     def _open_archive(self):
@@ -106,13 +105,10 @@ class WikiArchiveLoader:
                             yield validated_entry
 
                         except ValidationError as e:
-                            if self.__silent_validation_error:
-                                continue
-                            else:
-                                logger.warning(
-                                    f"Validation error at {filename}:{line_number}: {e}"
-                                )
+                            if self.__stop_on_error:
                                 raise
+                            else:
+                                self.__validation_errors[model_class].append(e)
                         except Exception as e:
                             logger.error(
                                 f"Unexpected error processing {filename}:{line_number}: {e}"
@@ -204,3 +200,12 @@ class WikiArchiveLoader:
             file_name: self._load_entries(file_name, model_class)
             for file_name, model_class in self.FILE_MODEL_MAP.items()
         }
+
+    def get_validation_errors(self) -> dict[type, list[ValidationError]]:
+        """
+        Get validation errors encountered during loading.
+
+        Returns:
+            Dictionary mapping model classes to lists of ValidationError instances
+        """
+        return dict(self.__validation_errors)

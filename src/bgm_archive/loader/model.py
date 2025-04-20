@@ -1,6 +1,8 @@
 from enum import Enum, IntEnum
 from typing import Dict, List, Optional, Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+
+_config = ConfigDict(use_enum_values=True)
 
 
 class SubjectType(IntEnum):
@@ -16,6 +18,8 @@ class SubjectType(IntEnum):
 class PersonType(IntEnum):
     """Person types in Bangumi."""
 
+    _UNKNOWN = 0  # TODO: ask upstream
+
     INDIVIDUAL = 1  # 个人
     COMPANY = 2  # 公司
     ASSOCIATION = 3  # 组合
@@ -27,6 +31,8 @@ class CharacterRole(IntEnum):
     MAIN = 1  # 主角
     SUPPORTING = 2  # 配角
     GUEST = 3  # 客串
+
+    _UNKNOWN4 = 4  # TODO: ask upstream
 
 
 class EpisodeType(IntEnum):
@@ -56,6 +62,9 @@ class RelationType(IntEnum):
     ADAPTATION = 10  # 改编
     ALTERNATIVE_SETTING = 11  # 不同世界观
     OTHER = 0  # 其他
+
+    # UNKNOWN_1 = 4002  # TODO: ask upstream
+    # UNKNOWN_2 = 4006  # TODO: ask upstream
 
 
 class CharacterSubjectType(IntEnum):
@@ -101,6 +110,8 @@ class Favorite(BaseModel):
 class Subject(BaseModel):
     """Subject model (anime, book, game, etc.)."""
 
+    model_config = _config
+
     id: int
     type: SubjectType
     name: str
@@ -121,6 +132,8 @@ class Subject(BaseModel):
 
 class Person(BaseModel):
     """Person model (individual, company, association)."""
+
+    model_config = _config
 
     id: int
     name: str
@@ -152,15 +165,17 @@ class Episode(BaseModel):
     name_cn: str
     description: str
     airdate: str
-    disc: str
+    disc: int
     duration: str
     subject_id: int
-    sort: int
+    sort: int | float
     type: EpisodeType
 
 
 class SubjectRelation(BaseModel):
     """Relation between subjects."""
+
+    model_config = _config
 
     subject_id: int
     relation_type: RelationType

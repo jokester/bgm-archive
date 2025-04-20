@@ -17,9 +17,7 @@ def validate_wiki_archive(path: Path):
     Returns:
         Counter with counts of each entity type
     """
-    loader = WikiArchiveLoader(
-        str(path), silent_validation_error=True, stop_on_error=False
-    )
+    loader = WikiArchiveLoader(str(path), stop_on_error=False)
     entity_counts = Counter()
 
     # Process subjects
@@ -65,6 +63,12 @@ def validate_wiki_archive(path: Path):
     # Print summary
     print("\nValidation Summary:")
     for entity_type, count in entity_counts.items():
-        print(f"  {entity_type}: {count}")
+        print(f"  {entity_type}: {count} succeeded")
+
+    all_errors = loader.get_validation_errors()
+    for model_class, errors in all_errors.items():
+        print(f"Validation errors for {model_class.__name__}:")
+        for error in errors[:3]:
+            print(f"  - {error}")
 
     return entity_counts
