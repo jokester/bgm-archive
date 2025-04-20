@@ -1,5 +1,5 @@
 import click
-from .validate_archive import validate_archive
+from .validate_archive import validate_wiki_archive
 
 
 @click.group()
@@ -9,7 +9,7 @@ def cli():
 
 
 # Register commands
-cli.add_command(validate_archive)
+cli.add_command(validate_wiki_archive)
 
 
 if __name__ == "__main__":

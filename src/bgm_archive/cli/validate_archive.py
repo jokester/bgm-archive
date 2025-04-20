@@ -5,6 +5,8 @@ from collections import Counter
 from ..loader.wiki_archive_loader import WikiArchiveLoader
 
 
+@click.command("validate-archive")
+@click.argument("path", type=click.Path(exists=True, path_type=Path))
 def validate_wiki_archive(path: Path):
     """
     Validate a Bangumi wiki archive by iterating through all entity types.
@@ -15,7 +17,9 @@ def validate_wiki_archive(path: Path):
     Returns:
         Counter with counts of each entity type
     """
-    loader = WikiArchiveLoader(str(path))
+    loader = WikiArchiveLoader(
+        str(path), silent_validation_error=True, stop_on_error=False
+    )
     entity_counts = Counter()
 
     # Process subjects
@@ -64,34 +68,3 @@ def validate_wiki_archive(path: Path):
         print(f"  {entity_type}: {count}")
 
     return entity_counts
-
-
-@click.command()
-@click.argument("archive_path", type=click.Path(exists=True, path_type=Path))
-def validate_archive(archive_path: Path):
-    """
-    Validate a Bangumi wiki archive file.
-
-    This command iterates through all entity types in the archive,
-    validates them against their respective models, and provides
-    a summary of the entities found.
-
-    ARCHIVE_PATH: Path to the Bangumi wiki archive file (.zip)
-    """
-    print(f"Validating archive: {archive_path}")
-    entity_counts = validate_wiki_archive(archive_path)
-
-    total_entities = sum(entity_counts.values())
-    print(f"\nTotal entities validated: {total_entities}")
-
-    if total_entities > 0:
-        print("Archive validation completed successfully!")
-    else:
-        print("Warning: No entities found in the archive.")
-        return 1
-
-    return 0
-
-
-if __name__ == "__main__":
-    validate_archive()

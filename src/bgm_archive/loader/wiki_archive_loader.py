@@ -102,21 +102,22 @@ class WikiArchiveLoader:
                             if not line_str:  # Skip empty lines
                                 continue
 
-                            data = json.loads(line_str)
-                            validated_entry = model_class.model_validate_json(data)
+                            validated_entry = model_class.model_validate_json(line_str)
                             yield validated_entry
 
                         except ValidationError as e:
-                            if not self.__silent_validation_error:
+                            if self.__silent_validation_error:
+                                continue
+                            else:
                                 logger.warning(
                                     f"Validation error at {filename}:{line_number}: {e}"
                                 )
-                            if self.__stop_on_error:
                                 raise
                         except Exception as e:
                             logger.error(
                                 f"Unexpected error processing {filename}:{line_number}: {e}"
                             )
+                            raise
             except KeyError:
                 logger.warning(f"File {filename} not found in archive")
 
