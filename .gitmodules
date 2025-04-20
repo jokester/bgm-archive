@@ -1,0 +1,3 @@
+[submodule "vendor/bangumi-common"]
+	path = vendor/bangumi-common
+	url = https://github.com/bangumi/common
