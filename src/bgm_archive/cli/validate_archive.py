@@ -67,8 +67,10 @@ def validate_wiki_archive(path: Path):
 
     all_errors = loader.get_validation_errors()
     for model_class, errors in all_errors.items():
-        print(f"Validation errors for {model_class.__name__}:")
+        print(f"First validation errors for {model_class.__name__}:")
         for error in errors[:3]:
             print(f"  - {error}")
+        problematic_values = set(ed["input"] for e in errors for ed in e.errors())
+        print(f"  - input values: {problematic_values}")
 
     return entity_counts
